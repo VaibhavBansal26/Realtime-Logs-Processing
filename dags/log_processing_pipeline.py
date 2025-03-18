@@ -107,10 +107,10 @@ def consume_and_index_logs():
     consumer.subscribe([topic])
 
     # Before we start consuming messages, we need to make sure that the index exists
+    data_stream_index_name = 'website_logs'
     try:
-        data_stream_index_name = 'website_logs'
-        if not es.indices.exists(data_stream_index_name):
-            es.indices.create(data_stream_index_name)
+        if not es.indices.exists(index=data_stream_index_name):
+            es.indices.create(index=data_stream_index_name)
             logger.info(f'Index created: {data_stream_index_name}')
     except Exception as e:
         logger.error(f'Error creating index: {e}')
@@ -119,13 +119,12 @@ def consume_and_index_logs():
     try:
         logs = []
         while True:
-            message = consumer.poll(timeout=1.0) # Poll for new messages, wait for 1 second to receive messages from Kafka
+            message = consumer.poll(timeout=1.0)
             if message is None:
                 continue
             if message.error():
                 if message.error().code() == KafkaException._PARTITION_EOF:
-                    logger.warning('End of partition reached {0}/{1}'
-                                    .format(message.topic(), message.partition()))
+                    logger.warning('End of partition reached {0}/{1}'.format(message.topic(), message.partition()))
                 else:
                     logger.error(f'Error occurred: {message.error().str()}')
             else:
@@ -135,7 +134,7 @@ def consume_and_index_logs():
                 if parsed_log:
                     logs.append(parsed_log)
                 
-                # index when 15000 logs are collected
+                # Index when 2000 logs are collected
                 if len(logs) >= 2000:
                     actions = [
                         {
@@ -144,14 +143,15 @@ def consume_and_index_logs():
                             '_source': log
                         }
                         for log in logs
-                        ]
-                    success, failed = es.bulk(actions, refresh=True)
-                    logger.info(f'Indexed {success} logs, failed to index {len(failed)} logs')
+                    ]
+                    bulk_response = es.bulk(body=actions, refresh=True)
+                    # You can parse bulk_response to get success or error details if needed
+                    logger.info(f'Bulk indexing response: {bulk_response}')
                     logs = []
     except Exception as e:
         logger.error(f'Failed to index log: {e}')
-    
-    # index remaining logs
+
+    # Index remaining logs after exiting the loop
     try:
         if logs:
             actions = [
@@ -162,15 +162,14 @@ def consume_and_index_logs():
                 }
                 for log in logs
             ]
-            es.bulk(actions, refresh=True)
-            logs = []
+            es.bulk(body=actions, refresh=True)
+            # logs = []
     except Exception as e:
         logger.error(f'Failed to index log: {e}')
     finally:
         consumer.close()
         es.close()
         logger.info('Consumer closed')
-
 
 default_args = {
     'owner': 'Data Lab',
