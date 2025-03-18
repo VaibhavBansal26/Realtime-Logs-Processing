@@ -88,7 +88,7 @@ def consume_and_index_logs():
                     logs.append(parsed_log)
                 
                 # index when 15000 logs are collected
-                if len(logs) >= 15000:
+                if len(logs) >= 2000:
                     actions = [
                         {
                             '_op_type': 'index',
