@@ -104,11 +104,11 @@ def consume_and_index_logs():
 
     consumer = Consumer(kafka_consumer_config)
     es = Elasticsearch(**es_config)
-    topic = 'website_logs'
+    topic = 'website_logs_latest'
     consumer.subscribe([topic])
 
     # Before we start consuming messages, we need to make sure that the index exists
-    data_stream_index_name = 'website_logs'
+    data_stream_index_name = 'website_logs_latest'
     try:
         if not es.indices.exists(index=data_stream_index_name):
             es.indices.create(index=data_stream_index_name)

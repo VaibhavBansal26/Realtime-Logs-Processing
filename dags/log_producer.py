@@ -118,7 +118,7 @@ def produce_logs(**context):
     }
 
     producer = create_kafka_producer(kafka_config)
-    topic = 'website_logs'
+    topic = 'website_logs_latest'
 
     for _ in range(15000):
         log = generate_log()

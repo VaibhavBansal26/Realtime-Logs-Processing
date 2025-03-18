@@ -27,14 +27,21 @@ airflow users create \
 --role Admin \
 --email vaibhav.bansal2020@gmail.com
 ```
+1. Store Secrets in AWS Secrets Manager
+    a. KAFKA_SASL_USERNAME
+    b. KAFKA_SASL_PASSWORD
+    c. KAFKA_BOOTSTRAP_SERVER
+    d. ELASTICSEARCH_URL
+    e. ELASTICSEARCH_API_KEY
 
-1. Create account in confluent kafka
-2. Get bootstrap server url, username and password
-3. Create environment and cluster in confluent kafka
-4. Create account in elasticsearch
-5. Create index in elasticserarch with partitions with a particular name in dags and get the elasticsearch url and api key to be stored in aws secrets manager
-6. CREATE IAM USER
-7. CREATE S3 Bucket
-8. Go to AWS MANAGER APACHE AIRFLOW -> Create New Environment -> Link it to your dags -> Run Dag On Airflow
-9. Configure the path for dag folder, S3 bucket, & requirements file
-10. Create VPC and Add Secret Manager Read-Write policy to role in MWAA
+1. Create account in confluent kafka -> Create Environment -> Provision Cluster -> Create Topic
+2. Get bootstrap Server from Cluster Settings in Kafka
+3. Get bootstrap server url, username and password from API keys (Generate if not available)
+4. Create environment and cluster in confluent kafka
+5. Create account in elasticsearch
+6. Create index in elasticserarch with partitions with a particular name in dags and get the elasticsearch url and api key to be stored in aws secrets manager
+7. CREATE IAM USER
+8. CREATE S3 Bucket
+9. Go to AWS MANAGER APACHE AIRFLOW -> Create New Environment -> Link it to your dags -> Run Dag On Airflow
+10. Configure the path for dag folder, S3 bucket, & requirements file
+11. Create VPC and Add Secret Manager Read-Write policy to role in MWAA
