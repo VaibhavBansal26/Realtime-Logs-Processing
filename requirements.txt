@@ -1,0 +1,8 @@
+boto3
+faker
+elasticsearch
+confluent-kafka
+pandas
+numpy
+matplotlib
+apache-airflow
