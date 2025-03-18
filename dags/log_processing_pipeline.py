@@ -9,6 +9,7 @@ import re
 import boto3
 #from ..secret.secret import get_secret
 from botocore.exceptions import ClientError
+from elasticsearch import Elasticsearch, helpers
 
 logger = logging.getLogger(__name__)
 
@@ -114,7 +115,6 @@ def consume_and_index_logs():
             logger.info(f'Index created: {data_stream_index_name}')
     except Exception as e:
         logger.error(f'Error creating index: {e}')
-    
 
     try:
         logs = []
@@ -144,14 +144,13 @@ def consume_and_index_logs():
                         }
                         for log in logs
                     ]
-                    bulk_response = es.bulk(body=actions, refresh=True)
-                    # You can parse bulk_response to get success or error details if needed
+                    bulk_response = helpers.bulk(es, actions, refresh=True)
                     logger.info(f'Bulk indexing response: {bulk_response}')
                     logs = []
     except Exception as e:
         logger.error(f'Failed to index log: {e}')
 
-    # Index remaining logs after exiting the loop
+    # Index remaining logs
     try:
         if logs:
             actions = [
@@ -162,8 +161,8 @@ def consume_and_index_logs():
                 }
                 for log in logs
             ]
-            es.bulk(body=actions, refresh=True)
-            # logs = []
+            helpers.bulk(es, actions, refresh=True)
+            logs = []
     except Exception as e:
         logger.error(f'Failed to index log: {e}')
     finally:
