@@ -4,7 +4,10 @@ from confluent_kafka import Producer
 from faker import Faker
 import logging
 from datetime import datetime, timedelta
-from ..secret.secret import get_secret
+#from ..secret.secret import get_secret
+import boto3
+from botocore.exceptions import ClientError
+import json
 
 
 fake = Faker()
@@ -20,6 +23,32 @@ default_args = {
     'retries': 1,
     'retry_delay': timedelta(seconds=5)
 }
+
+def get_secret(secret_name,region_name):
+
+    # secret_name = "MWAA_Secrets_V2"
+    # region_name = "us-east-1"
+
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        # For a list of exceptions thrown, see
+        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+        raise e
+
+    secret = json.loads(get_secret_value_response['SecretString'])
+
+    # Your code goes here.
+    return secret
 
 def create_kafka_producer(kafka_config):
     """

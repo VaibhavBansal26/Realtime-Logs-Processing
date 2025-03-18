@@ -7,9 +7,36 @@ import json
 import logging
 import re
 import boto3
-from ..secret.secret import get_secret
+#from ..secret.secret import get_secret
+from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)
+
+def get_secret(secret_name,region_name):
+
+    # secret_name = "MWAA_Secrets_V2"
+    # region_name = "us-east-1"
+
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        # For a list of exceptions thrown, see
+        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+        raise e
+
+    secret = json.loads(get_secret_value_response['SecretString'])
+
+    # Your code goes here.
+    return secret
 
 
 def parse_log_entry(log_entry):
