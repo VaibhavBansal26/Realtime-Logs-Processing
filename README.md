@@ -37,4 +37,4 @@ airflow users create \
 7. CREATE S3 Bucket
 8. Go to AWS MANAGER APACHE AIRFLOW -> Create New Environment -> Link it to your dags -> Run Dag On Airflow
 9. Configure the path for dag folder, S3 bucket, & requirements file
-10. Create VPC
+10. Create VPC and Add Secret Manager Read-Write policy to role in MWAA

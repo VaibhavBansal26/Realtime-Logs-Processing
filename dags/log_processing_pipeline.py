@@ -39,6 +39,25 @@ def get_secret(secret_name,region_name):
     return secret
 
 
+# def parse_log_entry(log_entry):
+#     """
+#     Function to parse a log entry
+#     """
+#     log_pattern = r'(?P<ip>[\d\.]+) - - \[(?P<timestamp>.*)\] "(?P<method>\w+) (?P<endpoint>[\w/]+) (?P<protocol>[\w/\.]+)'
+#     match = re.match(log_pattern, log_entry)
+#     if not match:
+#         logger.error(f'Failed to parse log entry: {log_entry}')
+#         return None
+#     log = match.groupdict()
+
+#     try:
+#         parse_timestamp = datetime.strptime(log['timestamp'], '%d/%b/%Y:%H:%M:%S')
+#         log['timestamp'] = parse_timestamp.isoformat()
+#     except Exception as e:
+#         logger.error(f'Failed to parse timestamp: {e}')
+#         return None
+#     return log
+
 def parse_log_entry(log_entry):
     """
     Function to parse a log entry
@@ -51,12 +70,14 @@ def parse_log_entry(log_entry):
     log = match.groupdict()
 
     try:
-        parse_timestamp = datetime.strptime(log['timestamp'], '%d/%b/%Y:%H:%M:%S')
+        # Updated format string to match "Mar 18 2025, 14:26:59"
+        parse_timestamp = datetime.strptime(log['timestamp'], '%b %d %Y, %H:%M:%S')
         log['timestamp'] = parse_timestamp.isoformat()
     except Exception as e:
         logger.error(f'Failed to parse timestamp: {e}')
         return None
     return log
+
 
 def consume_and_index_logs():
     """
